@@ -34,21 +34,21 @@ def test_package_authors_invalid():
     )
 
 
-@pytest.mark.parametrize("category", ["main", "dev"])
-def test_package_add_dependency_vcs_category(category, f):
+@pytest.mark.parametrize("groups", [["default"], ["dev"]])
+def test_package_add_dependency_vcs_groups(groups, f):
     package = Package("foo", "0.1.0")
 
     dependency = package.add_dependency(
         f.create_dependency(
             "poetry",
             {"git": "https://github.com/python-poetry/poetry.git"},
-            category=category,
+            groups=groups,
         )
     )
-    assert dependency.category == category
+    assert dependency.groups == frozenset(groups)
 
 
-def test_package_add_dependency_vcs_category_default_main(f):
+def test_package_add_dependency_vcs_groups_default_main(f):
     package = Package("foo", "0.1.0")
 
     dependency = package.add_dependency(
@@ -56,12 +56,12 @@ def test_package_add_dependency_vcs_category_default_main(f):
             "poetry", {"git": "https://github.com/python-poetry/poetry.git"}
         )
     )
-    assert dependency.category == "main"
+    assert dependency.groups == frozenset(["default"])
 
 
-@pytest.mark.parametrize("category", ["main", "dev"])
+@pytest.mark.parametrize("groups", [["default"], ["dev"]])
 @pytest.mark.parametrize("optional", [True, False])
-def test_package_url_category_optional(category, optional, f):
+def test_package_url_groups_optional(groups, optional, f):
     package = Package("foo", "0.1.0")
 
     dependency = package.add_dependency(
@@ -71,10 +71,10 @@ def test_package_url_category_optional(category, optional, f):
                 "url": "https://github.com/python-poetry/poetry/releases/download/1.0.5/poetry-1.0.5-linux.tar.gz",
                 "optional": optional,
             },
-            category=category,
+            groups=groups,
         )
     )
-    assert dependency.category == category
+    assert dependency.groups == frozenset(groups)
     assert dependency.is_optional() == optional
 
 
